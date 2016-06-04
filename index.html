@@ -32,33 +32,92 @@
 
 // });
 $(function(){
-
+      //
+      function buildgrid(){
+        gridster.remove_all_widgets();
+            var grid_layout = JSON.parse(localStorage.getItem("grid_layout"))
+            $.each(grid_layout, function() {
+                html = this.html
+                gridster.add_widget('<div>'+html+'</div>', this.size_x, this.size_y, this.col, this.row);
+            });
+            console.log("Grid building compelete")
+      }
+      
+      // rebuild old layout
+       $('.js-seralize').on('click', function() {
+            gridster.remove_all_widgets();
+            var grid_layout = JSON.parse(localStorage.getItem("grid_layout"))
+            $.each(grid_layout, function() {
+                html = this.html
+                gridster.add_widget('<div>'+html+'</div>', this.size_x, this.size_y, this.col, this.row);
+            });
+        });
       // inistalize data... ajax 
-     var data_res = {};
-     
+      var data_res = {};
+      var result;
       $.ajax({
         url: "http://beta.json-generator.com/api/json/get/Vk0zTE5Qb"
-        }).done(function(response) {
-        console.log(response)
+      }).done(function(response) {
+        // console.log(response)
         data_res = response
       });
 
-
+      localStorage.setItem("grid_layout22", "result");
 
       gridster = $(".gridster > ul").gridster({
         widget_margins: [5, 5],
         widget_base_dimensions: [100, 55],
         autogenerate_stylesheet: true,
         resize: {
-          enabled: true
-        }
-      }).data('gridster');
+          enabled: true,
+          start: function(e, ui, $widget) {
+             
+            },
+
+            resize: function(e, ui, $widget) {
+              
+            },
+
+            stop: function(e, ui, $widget) {
+             result = gridster.serialize();
+            // console.log(result)
+            localStorage.setItem("grid_layout", JSON.stringify(result));
+            }
+        },
+        draggable: {
+          start: function(e, ui, $widget) {
+
+          },
+
+          drag: function(e, ui, $widget) {
+
+          },
+
+          stop: function(e, ui, $widget) {
+            result = gridster.serialize();
+            // console.log(result)
+            localStorage.setItem("grid_layout", JSON.stringify(result));
 
 
-    
+          }
+        },
+        serialize_params: function($w, wgd) { 
+          return { 
+           id: $w.attr('id'), 
+           col: wgd.col, 
+           row: wgd.row, 
+           size_x: wgd.size_x, 
+           size_y: wgd.size_y,
+           html:$w.html()                           
+         };
+       }
+     }).data('gridster');
 
 
-      console.log(data_res)
+      buildgrid();
+
+
+      // console.log(data_res)
       var widgets = [
       ['<li>0</li>', 1, 2],
       ['<li>1</li>', 3, 2],
@@ -77,8 +136,10 @@ $(function(){
       $.each(widgets, function(i, widget){
         gridster.add_widget.apply(gridster, widget)
       });
-      var result = gridster.serialize();
-      console.log(result)
+      // var result = gridster.serialize();
+      // 
+      // 
+      console.log(JSON.parse(localStorage.getItem("grid_layout")));
     });
   </script>
   <title></title>
@@ -87,7 +148,8 @@ $(function(){
 -->
 <!-- <p><a class="btn btn-success" href="javascript:void(0);" onClick="generate();">Generate Screenshot &raquo;</a></p> -->
 <body>
-
+ <p><button class="js-seralize btn btn-success">Build from serialize</button></p>
+<br>
 	<div class="gridster col-xs-12">
 		<ul>
     </ul>
